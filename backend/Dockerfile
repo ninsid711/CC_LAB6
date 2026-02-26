@@ -8,6 +8,6 @@ COPY app.cpp .
 
 RUN g++ app.cpp -o app
 
-EXPOSE 8080
+EXPOSE 8081
 
 CMD ["./app"]
