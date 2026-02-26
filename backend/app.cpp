@@ -26,16 +26,16 @@ int main() {
     address.sin_port = htons(8080);
     
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
-        std::cerr << "ERROR: Failed to bind to port 8081" << std::endl;
+        std::cerr << "ERROR: Failed to bind to port 8080" << std::endl;
         return 1;
     }
     
     if (listen(server_fd, 10) < 0) {
-        std::cerr << "ERROR: Failed to listen on port 8081" << std::endl;
+        std::cerr << "ERROR: Failed to listen on port 8080" << std::endl;
         return 1;
     }
     
-    std::cout << "Server listening on port 8081 (hostname: " << hostname << ")" << std::endl;
+    std::cout << "Server listening on port 8080 (hostname: " << hostname << ")" << std::endl;
     
     // Accept connections in loop
     while(true) {
@@ -43,12 +43,17 @@ int main() {
         if (client_fd < 0) continue;
         
         // Simple HTTP response
-        std::string response = "HTTP/1.1 200 OK\r\n";
-        response += "Content-Type: text/plain\r\n";
-        response += "Connection: close\r\n\r\n";
-        response += "Served by backend: " + std::string(hostname) + "\n";
-        
-        send(client_fd, response.c_str(), response.length(), 0);
+        std::string body = std::string("Served by backend: ") + std::string(hostname) + "\n";
+
+        std::string response =
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/plain\r\n"
+            "Content-Length: " + std::to_string(body.size()) + "\r\n"
+            "Connection: close\r\n"
+            "\r\n" +
+            body;
+
+        send(client_fd, response.c_str(), response.size(), 0);
         close(client_fd);
     }
     
